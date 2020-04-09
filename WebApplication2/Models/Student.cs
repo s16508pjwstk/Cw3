@@ -22,9 +22,20 @@ namespace WebApplication2.Models
             get; set;
         }
 
+        public string BirthDate
+        {
+            get; set;
+        }
+
         public string IndexNumber
         {
             get; set;
         }
+
+        public int IdEnrollment
+        {
+            get; set;
+        }
+
     }
 }
