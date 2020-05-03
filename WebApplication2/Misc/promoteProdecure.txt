@@ -1,0 +1,34 @@
+create procedure PromoteStudents6 @semester int,  @studies nvarchar(60)
+AS
+declare
+@StudiesId int,
+@BeforePromotionEnrollmentId int,
+@AfterPromotionEnrollmentId int
+
+begin
+set @StudiesId =
+(
+	select IdStudy from Studies where Name = @studies
+)
+Print 'Requested studies Id is: ' + cast(@StudiesId as varchar);
+set @BeforePromotionEnrollmentId = 
+(
+	select IdEnrollment from Enrollment where IdStudy = @StudiesId and Semester = @semester
+)
+Print 'Before promotion IdEnrollment is : ' + cast(@BeforePromotionEnrollmentId as varchar);
+
+set @AfterPromotionEnrollmentId =
+(
+	select IdEnrollment from Enrollment where IdStudy = @StudiesId and Semester = @semester + 1
+)
+	Print 'After promotion IdEnrollment is: ' +  cast(@AfterPromotionEnrollmentId as varchar); 
+if (@AfterPromotionEnrollmentId is null)
+	begin
+	Print 'empty enrollment detected, I have got to add new one'
+	set @AfterPromotionEnrollmentId = (SELECT ISNULL(MAX(IdEnrollment) + 1, 1) FROM Enrollment);
+	insert into Enrollment (IdEnrollment, Semester, IdStudy, StartDate) values (@AfterPromotionEnrollmentId, @semester + 1, @StudiesId, GETDATE())
+	Print 'After promotion IdEnrollment of freshly added entity is: ' + cast(@AfterPromotionEnrollmentId as varchar); 
+	end
+Print 'Now I am going to promote students'
+update Student set IdEnrollment = @AfterPromotionEnrollmentId where IdEnrollment = @BeforePromotionEnrollmentId;
+end
