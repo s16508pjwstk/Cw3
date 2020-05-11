@@ -7,7 +7,7 @@ namespace WebApplication2.Models
 {
     public class Student
     {
-        public int IdStudent
+        public string IdStudent
         {
             get; set;
         }

@@ -26,7 +26,7 @@ namespace WebApplication2.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetStudent(int id)
+        public IActionResult GetStudent(string id)
         {
             return Ok(_dbService.GetStudent(id));
         }

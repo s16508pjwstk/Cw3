@@ -18,7 +18,7 @@ namespace WebApplication2.DAL
             
         }
 
-        public Student GetStudent(int id)
+        public Student GetStudent(string id)
         {
             using (SqlConnection connection = new SqlConnection(
                connectionString))
@@ -32,7 +32,7 @@ namespace WebApplication2.DAL
                 var st = new Student();
                 while (dr.Read())
                 {
-                    st.IdStudent = int.Parse(dr["IndexNumber"].ToString());
+                    st.IdStudent = (dr["IndexNumber"].ToString());
                     st.FirstName = dr["FirstName"].ToString();
                     st.LastName = dr["LastName"].ToString();
                     st.BirthDate = dr["BirthDate"].ToString();
@@ -57,7 +57,7 @@ namespace WebApplication2.DAL
                 while (dr.Read())
                 {
                     var st = new Student();
-                    st.IdStudent = int.Parse(dr["IndexNumber"].ToString());
+                    st.IdStudent = dr["IndexNumber"].ToString();
                     st.FirstName = dr["FirstName"].ToString();
                     st.LastName = dr["LastName"].ToString();
                     st.BirthDate = dr["BirthDate"].ToString();
