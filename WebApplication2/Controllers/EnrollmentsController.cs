@@ -3,81 +3,68 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication2.DAL;
+using WebApplication2.DAL.Dto;
 using WebApplication2.DTO.Request;
 using WebApplication2.Models;
 
 namespace WebApplication2.Controllers
 {
-    [Route("api/enrollments")]
     [ApiController]
-    public class EnrollmentsController : ControllerBase
+    [Route("api/enrollments")]
+    public class EnrollmentsController : Controller
     {
-        private static IEnumerable<Study> _studies;
+        private readonly IStudentDbService _dbService;
 
-        private static List<Study> studiesList;
-        static string connectionString = "Data Source=localhost\\localsql;Initial Catalog=apbd1;User ID=sa;Password=Szuchow97!";
-
-        private IStudentDbService _service;
-
-        public EnrollmentsController(IStudentDbService service)
+        public EnrollmentsController(IStudentsDbService dbService)
         {
-            _service = service;
+            _dbService = dbService;
         }
-
         [HttpPost]
-        public IActionResult CreateEnrollment(StudentEnrollmentForm studentEnrollmentForm)
+        public IActionResult AddEnrollment(EnrollmentDTO enrollmentDTO)
         {
-            if (studentEnrollmentForm.FirstName == null)
+            if (!ModelState.IsValid)
             {
+                var state = ModelState;
                 return BadRequest();
             }
-            else if (studentEnrollmentForm.IndexNumber == null)
-            {
-                return BadRequest();
-            }
-            else if (studentEnrollmentForm.LastName == null)
-            {
-                return BadRequest();
-            }
-            else if (studentEnrollmentForm.BirthDate == null)
-            {
-                return BadRequest();
-            }
-            else if (studentEnrollmentForm.Studies == null)
-            {
-                return BadRequest();
-            }
+            Enrollment enrollment = _dbService.EnrollStudent(enrollmentDTO);
 
-            Enrollment enrollment = new Enrollment();
-            try
+            if (enrollment != null)
             {
-                enrollment = _service.EnrollStudent(studentEnrollmentForm);
-            } catch (NullReferenceException)
+                return Created("api/students/" + enrollmentDTO.IndexNumber, enrollment);
+            }
+            else
             {
                 return BadRequest();
             }
-            catch (SqlException e)
-            {
-                return BadRequest(e.Message);
-            }
-            return Created("", enrollment);
-            
-           
 
         }
+
+
 
         [HttpPost("promotions")]
-        public IActionResult PromoteStudents(PromoteStudentsForm promoteStudentsForm)
+        public IActionResult Promote(PromotionDTO promotionDTO)
         {
-            Enrollment enrollment = new Enrollment();
-            try
+
+            if (!ModelState.IsValid)
             {
-                enrollment = _service.PromoteStudents(Int32.Parse(promoteStudentsForm.Semester), promoteStudentsForm.Studies);
-            } catch (NullReferenceException)
+                var state = ModelState;
+                return BadRequest();
+            }
+            Enrollment enrollment = _dbService.Promote(promotionDTO);
+            if (enrollment != null)
+            {
+                return Created("", enrollment);
+            }
+            else
             {
                 return BadRequest();
             }
-            return Created("", enrollment);
         }
+
+    }
+
+    public interface IStudentsDbService
+    {
     }
 }

@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +15,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using WebApplication2.DAL;
+using WebApplication2.Handlers;
 using WebApplication2.Middleware;
 using WebApplication2.Models;
 using WebApplication2.Service;
@@ -35,64 +40,52 @@ namespace WebApplication2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IStudentDbService, SqlServerDbService>();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+             services.AddSingleton<IStudentDbService, SqlServerDbService>();
+             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+
+            //HTTP Basic
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidIssuer = "Gakko",
+                            ValidAudience = "Students",
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]))
+                        };
+                    });
+
+            // services.AddAuthentication("AuthenticationBasic")
+             //     .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("AuthenticationBasic", null);
+
+            // services.AddControllers()
+            //        .AddXmlSerializerFormatters();
+
+
+            //content negotiation
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseMyMiddleWare();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
             {
-                app.UseHsts();
-            }
-
-            
-            app.Use(async (context, next) =>
-            {
-                if (!context.Request.Headers.ContainsKey("Index"))
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await context.Response.WriteAsync("Nie podałes indeksu");
-                    return;
-                }
-
-                string index = context.Request.Headers["Index"].ToString();
-                
-
-                //check in db
-
-                using (SqlConnection connection = new SqlConnection(
-               connectionString))
-                {
-                    SqlCommand command = new SqlCommand("select * from Student where IndexNumber=@id", connection);
-                    command.Parameters.AddWithValue("id", index);
-                    command.Connection.Open();
-                    var dr = command.ExecuteReader();
-                    while (!dr.Read())
-                    {
-                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                        await context.Response.WriteAsync("Nie ma studenta o takim indeksie");
-                        return;
-                    }
-                    
-
-                }
-
-
-                await next();
+                endpoints.MapControllers();
             });
-            app.UseHttpsRedirection();
-            //app.UseMiddleware<LoggingMiddleware>();
-
-            
-            app.UseMvc();
         }
     }
 }
