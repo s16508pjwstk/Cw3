@@ -11,7 +11,7 @@ namespace WebApplication2.DAL
     {
         private static IEnumerable<Student> _students;
         // baza wystawiona u siebie lokalnie
-        static string connectionString = "Data Source=localhost\\localsql;Initial Catalog=apbd1;User ID=sa;Password=<pass>";
+        static string connectionString = "Data Source=localhost\\localsql;Initial Catalog=apbd1;User ID=sa;Password=Szuchow97!";
 
         static MockDbService()
         {
