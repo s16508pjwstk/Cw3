@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication2.DAL;
 using WebApplication2.DTO.Request;
+using WebApplication2.GeneratedModels;
 using WebApplication2.Models;
 
 namespace WebApplication2.Controllers
@@ -15,7 +16,7 @@ namespace WebApplication2.Controllers
         private static IEnumerable<Study> _studies;
 
         private static List<Study> studiesList;
-        static string connectionString = "Data Source=localhost\\localsql;Initial Catalog=apbd1;User ID=sa;Password=Szuchow97!";
+        //static string connectionString = "Data Source=localhost\\localsql;Initial Catalog=apbd1;User ID=sa;Password=Szuchow97!";
 
         private IStudentDbService _service;
 
@@ -25,7 +26,7 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateEnrollment(StudentEnrollmentForm studentEnrollmentForm)
+        public IActionResult AddEnrollment(StudentEnrollmentForm studentEnrollmentForm)
         {
             if (studentEnrollmentForm.FirstName == null)
             {
@@ -60,7 +61,7 @@ namespace WebApplication2.Controllers
             {
                 return BadRequest(e.Message);
             }
-            return Created("", enrollment);
+            return Ok("Student enrolled!");
             
            
 
@@ -77,7 +78,7 @@ namespace WebApplication2.Controllers
             {
                 return BadRequest();
             }
-            return Created("", enrollment);
+            return Ok("Students promoted!");
         }
     }
 }

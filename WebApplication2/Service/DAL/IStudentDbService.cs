@@ -1,4 +1,5 @@
-﻿using WebApplication2.Models;
+﻿using WebApplication2.GeneratedModels;
+using WebApplication2.Models;
 
 namespace WebApplication2.DAL
 {

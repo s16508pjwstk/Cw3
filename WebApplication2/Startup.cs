@@ -35,7 +35,7 @@ namespace WebApplication2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IDbService, MockDbService>();
+            //services.AddScoped<IDbService, MockDbService>();
             services.AddSingleton<IStudentDbService, SqlServerDbService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -43,7 +43,7 @@ namespace WebApplication2
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseMyMiddleWare();
+            //app.UseMyMiddleWare();
 
             if (env.IsDevelopment())
             {
