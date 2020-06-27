@@ -7,7 +7,9 @@
   <ItemGroup>
     <Folder Include="DAL\" />
     <Folder Include="DTO\Response\" />
+    <Folder Include="GeneratedModels\" />
     <Folder Include="Misc\" />
+    <Folder Include="Service\DAL\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
